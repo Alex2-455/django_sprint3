@@ -30,14 +30,13 @@ class Category(BaseModel):
         'Идентификатор',
         unique=True,
         blank=False,
-        help_text='''Идентификатор страницы для URL; разрешены
-         символы латиницы, цифры, дефис и подчёркивание.''')
+        help_text='Идентификатор страницы для URL; разрешены символы латиницы, цифры, дефис и подчёркивание.')
 
     def __str__(self):
         return self.title
  
     class Meta:
-        verbose_name = 'Категория'
+        verbose_name = 'категория'
         verbose_name_plural = 'Категории'
 
     
@@ -51,8 +50,8 @@ class Location(BaseModel):
         return self.name
     
     class Meta:
-        verbose_name = 'Локация'
-        verbose_name_plural = 'Локации'
+        verbose_name = 'местоположение'
+        verbose_name_plural = 'Местоположения'
     
 
 
@@ -68,31 +67,32 @@ class Post(BaseModel):
         'Дата и время публикации',
         default=datetime.datetime.now,
         blank=False,
-        help_text='''Если установить дату и время в будущем — можно 
-        делать отложенные публикации.''')
+        help_text='Если установить дату и время в будущем — можно делать отложенные публикации.')
     location = models.ForeignKey(
         Location,
         on_delete=models.SET_NULL,
         related_name='location',
         verbose_name='Местоположение',
-        null=True)
+        null=True,
+        blank=True)
     category = models.ForeignKey(
         Category,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name='category',
         verbose_name='Категория',
+        null=True,
         blank=False)
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='author',
-        verbose_name='Автор Публикации',
+        verbose_name='Автор публикации',
         blank=False)
 
     def __str__(self):
         return self.title
     
     class Meta:
-        verbose_name = 'Публикация'
+        verbose_name = 'публикация'
         verbose_name_plural = 'Публикации'
         ordering = ['-pub_date']

@@ -11,6 +11,7 @@ def index(request):
             'author__username', 'category__title', 'text',
             'category__slug')
         .filter(is_published=True,
+                category__is_published=True,
                 pub_date__lte=datetime.now())[0:5]
                 )
     context = {'post_list': post_list}
@@ -24,7 +25,9 @@ def post_detail(request, post_id):
             'location__name', 'title', 'location__is_published',
             'author__username', 'category__title', 'text',
             'category__slug')
-        .filter(is_published=True, pub_date__lte=datetime.now()),
+        .filter(is_published=True,
+                category__is_published=True,
+                pub_date__lte=datetime.now()),
         pk=post_id)
     context = {'post': post}
     return render(request, template, context)
