@@ -1,21 +1,16 @@
 from django.shortcuts import get_object_or_404, render
-from datetime import datetime
+from django.utils import timezone
 from .models import Category, Post
 
 
 def index(request):
     template = 'blog/index.html'
     post_list = (
-        Post.objects.values(
-            'pub_date', 'id', 'location',
-            'location__name', 'title', 'location__is_published',
-            'author__username', 'category__title', 'text',
-            'category__slug'
-        )
+        Post.objects.select_related('location', 'category', 'author')
         .filter(
             is_published=True,
             category__is_published=True,
-            pub_date__lte=datetime.now()
+            pub_date__lte=timezone.now()
         )[:5]
     )
     context = {'post_list': post_list}
@@ -25,17 +20,10 @@ def index(request):
 def post_detail(request, post_id):
     template = 'blog/detail.html'
     post = get_object_or_404(
-        Post.objects.values(
-            'pub_date', 'location',
-            'location__name', 'title', 'location__is_published',
-            'author__username', 'category__title', 'text',
-            'category__slug'
-        )
-        .filter(
-            is_published=True,
-            category__is_published=True,
-            pub_date__lte=datetime.now()
-        ),
+        Post.objects.select_related('location', 'category', 'author'),
+        is_published=True,
+        category__is_published=True,
+        pub_date__lte=timezone.now(),
         pk=post_id
     )
     context = {'post': post}
@@ -49,16 +37,11 @@ def category_posts(request, p_category):
         slug=p_category,
         is_published=True)
     post_list = (
-        Post.objects.values(
-            'pub_date', 'location', 'id',
-            'location__name', 'title', 'location__is_published',
-            'author__username', 'category__title', 'text',
-            'category__slug', 'category__description'
-        )
+        Post.objects.select_related('location', 'category', 'author')
         .filter(
             is_published=True,
             category__slug=p_category,
-            pub_date__lte=datetime.now()
+            pub_date__lte=timezone.now()
         )[:10]
     )
     context = {
